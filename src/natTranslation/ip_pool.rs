@@ -5,7 +5,7 @@ use std::process::exit;
 use std::rand::{task_rng, Rng};
 
 
-pub fn nat_pool(public_ip: &str, num_of_ip: u8, port_range: (u32, u32)){
+pub fn nat_pool(public_ip: &str, num_of_ip: u8, port_range: (u16, u16)){
 
     // public ip string convert and validate ipv4 address
     let ip: Ipv4Addr = public_ip.parse().expect(
