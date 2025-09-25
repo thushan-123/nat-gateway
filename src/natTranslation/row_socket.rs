@@ -1,21 +1,30 @@
-use std::net::Ipv4Addr;
+use std::net::{Ipv4Addr, ToSocketAddrs};
 use pnet::packet::tcp::{MutableTcpPacket, TcpFlags};
-use pnet::packet::ipv4::MutableIpv4Packet;
 use pnet::packet::ip::IpNextHeaderProtocols;
-use pnet::transport::{transport_channel, TransportChannelType::Layer3, TransportReceiver, TransportSender};
-use pnet::packet::Packet;
+use pnet::packet::ipv4::MutableIpv4Packet;
+use pnet::transport::{transport_channel, TransportChannelType::Layer3};
 
 fn raw_socket_bypass_kernel(
     public_ip: Ipv4Addr,
     public_port: u16,
     target: &str,
+    target_port: u16,
     request_data: &str,
 ) {
-    //create raw socket
+    // resolve target domain to IP
+    let target_ip: Ipv4Addr = match (target, 0).to_socket_addrs() {
+        Ok(mut addrs) => match addrs.next() {
+            Some(std::net::SocketAddr::V4(addr)) => *addr.ip(),
+            _ => panic!("Could not resolve target IP"),
+        },
+        Err(e) => panic!("DNS resolution failed: {:?}", e),
+    };
+
+    // create raw socket
     let (mut tx, mut rx) = transport_channel(4096, Layer3(IpNextHeaderProtocols::Tcp))
         .expect("Failed to create raw socket");
 
-    // build ipv4 header packet
+    // Build IPv4 header
     let mut ipv4_buffer = [0u8; 40];
     let mut ip_packet = MutableIpv4Packet::new(&mut ipv4_buffer).unwrap();
     ip_packet.set_source(public_ip);
@@ -25,7 +34,7 @@ fn raw_socket_bypass_kernel(
     ip_packet.set_header_length(5);
     ip_packet.set_ttl(64);
 
-    // tcp header build
+    // build TCP header (SYN)
     let mut tcp_buffer = [0u8; 20];
     let mut tcp_packet = MutableTcpPacket::new(&mut tcp_buffer).unwrap();
     tcp_packet.set_source(public_port);
@@ -33,22 +42,24 @@ fn raw_socket_bypass_kernel(
     tcp_packet.set_flags(TcpFlags::SYN);
     tcp_packet.set_sequence(0);
 
+    // attach TCP to IP data
     ip_packet.set_payload(tcp_packet.packet());
 
-    // Send SYN
+    // send SYN
     tx.send_to(ip_packet, std::net::IpAddr::V4(target_ip))
         .expect("Failed to send SYN");
+    println!("SYN sent to {}:{}", target_ip, target_port);
 
-    println!("SYN sent. You would now need to wait for SYN-ACK and complete handshake manually.");
-
-    // response requires capture packets
+    // Capture a response (SYN-ACK)
     let mut recv_buf = [0u8; 4096];
     match rx.next() {
         Ok(packet) => {
             println!("Received packet of length: {}", packet.len());
+
         }
         Err(e) => eprintln!("Error receiving packet: {:?}", e),
     }
 
 }
+
 
