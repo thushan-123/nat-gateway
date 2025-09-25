@@ -1,7 +1,8 @@
 
 use std;
 use std::collections::HashMap;
-use std::net::{TcpStream};
+use std::net::{Ipv4Addr, TcpStream};
+use std::process::exit;
 
 pub struct AllocatedIpMap {
     allocated_ip_map: HashMap<TcpStream,String>,
@@ -41,6 +42,28 @@ impl AllocatedIpMap{
     pub fn remove_stream(&mut self, socket: TcpStream){
         self.allocated_ip_map.remove(socket);
     }
+}
+
+
+pub fn nat_pool(public_ip_range: &str, port_range: (i32, i32)){
+
+    // public ip string convert and validate ipv4 address
+    let ip: Ipv4Addr = public_ip_range.parse().expect(
+        "Invalid ip address"
+    );
+
+    let (start_port, end_port) = port_range;
+    if(
+        !(
+            (start_port <=65535 && start_port >=40000) &&
+                (start_port <=65535 && start_port >=40000) &&
+                (start_port < end_port)
+        )
+    ){
+        eprintln!("Invalid prot range");
+        exit(1);
+    }
+
 }
 // socket - ((private_ip, private_port)  (public_ip, public_port))
 
