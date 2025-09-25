@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use std::net::{Ipv4Addr, TcpStream};
 
 struct AssignIP{
-    assign_ip: HashMap<Ipv4Addr, bool>
+    assign_ip: HashMap<u16,(Ipv4Addr, bool)>,
 }
 
 impl AssignIP{
@@ -26,7 +26,9 @@ impl AssignIP{
             self.assign_ip.insert(new_ip, false);
         }
 
+    }
 
-
+    pub fn get_ip(&mut self) -> Ipv4Addr {
+        // let keys = self.assign_ip.keys
     }
 }
