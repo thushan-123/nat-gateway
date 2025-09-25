@@ -28,6 +28,9 @@ fn main() {
                 println!("Accept the connection : {}", addr);
                 
                 // create a new separate thread
+                std::thread::spawn(|| {
+                    handle_client(socket);
+                });
             }
             Err(e) => {
                 eprintln!("Error accepting connection : {}", e);
