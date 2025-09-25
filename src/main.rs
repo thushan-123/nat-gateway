@@ -31,7 +31,7 @@ fn main() {
     loop {
         match listener.accept() {
             Ok((socket,addr)) => {
-                println!("Accept the connection : {}", addr);
+                println!("Accept the connection : {} {:?}", addr, socket);
                 
                 // create a new separate thread
                 std::thread::spawn(|| {
