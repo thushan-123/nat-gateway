@@ -1,4 +1,4 @@
-use std::io::{Read,Write,BufRead};
+use std::io::{Read,Write};
 use std::net::{TcpStream, TcpListener};
 
 fn handle_client(mut stream : TcpStream){
@@ -10,9 +10,15 @@ fn handle_client(mut stream : TcpStream){
     
     // convert data buffer into string
     
-    let request = String::from_utf8_lossy(&buffer[..]);
+    let request = String::from_utf8_lossy(&buffer[..]); // decode buff data
     
     println!("Received request : {}", request);  // print the request
+
+    let response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nHii hello client..".as_bytes();
+
+    stream.write(response).expect(
+        "Fail to send response to client"
+    );
 }
 
 
