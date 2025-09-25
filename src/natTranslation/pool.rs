@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use std::net::{TcpStream};
 
 pub struct AllocatedIpMap {
-    allocated_ip_map: HashMap<String,String>,
+    allocated_ip_map: HashMap<TcpStream,String>,
 }
 
 impl AllocatedIpMap{
@@ -15,16 +15,25 @@ impl AllocatedIpMap{
 
     pub fn allocate_ip(
         &mut self,
+        socket : TcpStream,
         private_ip: &str,
         private_port: i32,
         public_ip: &str,
         public_port: i32
     ){
+        let data_tuple = (
+            (
+                private_ip.to_string(),   // private ip tuple
+                private_port.to_string(),
+                ),
+            (
+                public_ip.to_string(),    // public ip tuple
+                private_port.to_string()
+                )
+            );
+
         self.allocated_ip_map.insert(
-            private_ip.to_string(),
-            private_port.to_string(),
-            public_ip.to_string(),
-            private_port.to_string()
+            socket, data_tuple
         )
     }
 }
