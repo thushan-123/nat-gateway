@@ -37,6 +37,9 @@ impl AssignIP{
         let random_number: u8 = rng.gen_range(0,self.num_of_ip);
 
         let (ip, status) = self.assign_ip.get(random_number);
+        if(!status){
+            self.assign_ip[random_number] = (ip, true);
+        }
         return (ip, status, random_number) ;
     }
 
