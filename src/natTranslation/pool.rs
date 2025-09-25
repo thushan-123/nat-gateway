@@ -36,6 +36,10 @@ impl AllocatedIpMap{
             socket, data_tuple
         )
     }
+
+    pub fn remove_stream(&mut self, socket: TcpStream){
+        self.allocated_ip_map.remove(socket);
+    }
 }
 // socket - ((private_ip, private_port)  (public_ip, public_port))
 
