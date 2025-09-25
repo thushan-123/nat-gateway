@@ -7,9 +7,33 @@ fn handle_client(mut stream : TcpStream){
     stream.read(&mut buffer).expect(
         "fail to read data from client"
     );
+    
+    // convert data buffer into string
+    
+    let request = String::from_utf8_lossy(&buffer[..]);
+    
+    println!("Received request : {}", request);  // print the request
 }
 
 
 fn main() {
-    println!("Hello, world!");
+    let listener = TcpListener::bind("127.0.0.1:8080").expect(
+        "fail to bind address 127.0.0.1:8080"
+    );
+    println!("TCP server running on 127.0.0.1:8080");
+    
+    loop {
+        match listener.accept() {
+            Ok((socket,addr)) => {
+                println!("Accept the connection : {}", addr);
+                
+                // create a new separate thread
+            }
+            Err(e) => {
+                eprintln!("Error accepting connection : {}", e);
+            }
+        }
+        
+    }
+    
 }
