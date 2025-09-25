@@ -5,7 +5,7 @@ pub fn connect_to_target_with_kernal(
     public_ip: Ipv4Addr,
     public_port:u16,
     target: &str,
-    request_data: String
+    request_data: &str
 ) {
     let source_addr = SocketAddr::new(IpAddr::V4(public_ip), public_port);
 
