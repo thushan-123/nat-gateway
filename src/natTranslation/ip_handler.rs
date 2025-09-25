@@ -2,7 +2,7 @@
 use std;
 use std::collections::HashMap;
 use std::net::{Ipv4Addr, TcpStream};
-use std::process::exit;
+
 
 pub struct AllocatedIpMap {
     allocated_ip_map: HashMap<TcpStream,String>,
